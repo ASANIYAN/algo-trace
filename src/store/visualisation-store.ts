@@ -1,7 +1,7 @@
-import type { PlaybackState, VisualizationData } from "@/types";
 import { create } from "zustand";
+import type { PlaybackState, VisualizationData } from "@/types";
 
-type VisualizationStore = {
+interface VisualizationStore {
   visualizationData: VisualizationData | null;
   setVisualizationData: (data: VisualizationData) => void;
 
@@ -13,17 +13,32 @@ type VisualizationStore = {
   pause: () => void;
   setSpeed: (speed: number) => void;
   reset: () => void;
-};
+
+  // Auto-play interval ID
+  playbackInterval: NodeJS.Timeout | null;
+  setPlaybackInterval: (interval: NodeJS.Timeout | null) => void;
+}
 
 export const useVisualizationStore = create<VisualizationStore>((set, get) => ({
   visualizationData: null,
-  setVisualizationData: (data) => set({ visualizationData: data }),
+  setVisualizationData: (data) =>
+    set({
+      visualizationData: data,
+      playback: {
+        currentStepIndex: 0,
+        isPlaying: false,
+        speed: 1000,
+      },
+    }),
 
   playback: {
     currentStepIndex: 0,
     isPlaying: false,
     speed: 1000,
   },
+
+  playbackInterval: null,
+  setPlaybackInterval: (interval) => set({ playbackInterval: interval }),
 
   setCurrentStep: (index) =>
     set((state) => ({
@@ -37,6 +52,20 @@ export const useVisualizationStore = create<VisualizationStore>((set, get) => ({
         state.playback.currentStepIndex + 1,
         maxSteps - 1,
       );
+
+      // Stop playing if we reached the end
+      if (newIndex === maxSteps - 1 && state.playback.isPlaying) {
+        if (state.playbackInterval) clearInterval(state.playbackInterval);
+        return {
+          playback: {
+            ...state.playback,
+            currentStepIndex: newIndex,
+            isPlaying: false,
+          },
+          playbackInterval: null,
+        };
+      }
+
       return { playback: { ...state.playback, currentStepIndex: newIndex } };
     }),
 
@@ -47,22 +76,55 @@ export const useVisualizationStore = create<VisualizationStore>((set, get) => ({
     }),
 
   play: () =>
-    set((state) => ({
-      playback: { ...state.playback, isPlaying: true },
-    })),
+    set((state) => {
+      // Clear any existing interval
+      if (state.playbackInterval) clearInterval(state.playbackInterval);
+
+      // Create new interval for auto-advance
+      const interval = setInterval(() => {
+        get().nextStep();
+      }, state.playback.speed);
+
+      return {
+        playback: { ...state.playback, isPlaying: true },
+        playbackInterval: interval,
+      };
+    }),
 
   pause: () =>
-    set((state) => ({
-      playback: { ...state.playback, isPlaying: false },
-    })),
+    set((state) => {
+      if (state.playbackInterval) clearInterval(state.playbackInterval);
+      return {
+        playback: { ...state.playback, isPlaying: false },
+        playbackInterval: null,
+      };
+    }),
 
   setSpeed: (speed) =>
-    set((state) => ({
-      playback: { ...state.playback, speed },
-    })),
+    set((state) => {
+      // If currently playing, restart with new speed
+      if (state.playback.isPlaying) {
+        if (state.playbackInterval) clearInterval(state.playbackInterval);
+
+        const interval = setInterval(() => {
+          get().nextStep();
+        }, speed);
+
+        return {
+          playback: { ...state.playback, speed },
+          playbackInterval: interval,
+        };
+      }
+
+      return { playback: { ...state.playback, speed } };
+    }),
 
   reset: () =>
-    set((state) => ({
-      playback: { ...state.playback, currentStepIndex: 0, isPlaying: false },
-    })),
+    set((state) => {
+      if (state.playbackInterval) clearInterval(state.playbackInterval);
+      return {
+        playback: { ...state.playback, currentStepIndex: 0, isPlaying: false },
+        playbackInterval: null,
+      };
+    }),
 }));

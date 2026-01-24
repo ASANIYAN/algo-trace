@@ -1,5 +1,6 @@
-import React from "react";
 import { useVisualizationStore } from "@/store/visualisation-store";
+import React from "react";
+import { DataStructureVisualizer } from "./data-structure-visualiser";
 
 export const VisualizationCanvas: React.FC = () => {
   const visualizationData = useVisualizationStore(
@@ -21,6 +22,22 @@ export const VisualizationCanvas: React.FC = () => {
 
   const currentStep = visualizationData.steps[currentStepIndex];
 
+  // ============================================================
+  // FIX: Merge state with highlightedNodes and highlightedEdges
+  // ============================================================
+  const visualizationState = {
+    ...currentStep?.state,
+    highlightedNodes: currentStep?.highlightedNodes || [],
+    highlightedEdges: currentStep?.highlightedEdges || [],
+  };
+
+  console.log(
+    "VisualizationCanvas rendering step",
+    currentStepIndex,
+    "with state:",
+    visualizationState,
+  );
+
   return (
     <div className="bg-background-secondary border border-border-primary rounded-lg p-6">
       <div className="mb-4">
@@ -29,23 +46,38 @@ export const VisualizationCanvas: React.FC = () => {
         </h3>
         <p className="text-sm text-text-secondary mt-1">
           Data Structure:{" "}
-          <span className="text-accent-blue">
+          <span className="text-accent-blue capitalize">
             {visualizationData.dataStructureType}
           </span>
         </p>
       </div>
 
-      {/* Visualization area - we'll add D3 here later */}
-      <div className="bg-background border border-border-secondary rounded-lg h-96 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-text-secondary mb-2">Visualization Canvas</p>
-          <p className="text-sm text-text-tertiary">
-            Step {currentStepIndex + 1} of {visualizationData.steps.length}
-          </p>
-          <p className="text-sm text-text-secondary mt-4">
-            {currentStep?.description}
-          </p>
-        </div>
+      {/* Step description */}
+      <div className="bg-background border border-border-secondary rounded-lg p-4 mb-4">
+        <p className="text-sm text-text-primary">
+          <span className="text-accent-blue font-semibold">
+            Step {currentStepIndex + 1}:
+          </span>{" "}
+          {currentStep?.description}
+        </p>
+      </div>
+
+      {/* Visualization */}
+      <div
+        className="bg-background border border-border-secondary rounded-lg"
+        style={{ height: "450px" }}
+      >
+        <DataStructureVisualizer
+          type={visualizationData.dataStructureType}
+          data={visualizationState}
+        />
+      </div>
+
+      {/* Explanation */}
+      <div className="mt-4 p-4 bg-background-tertiary border border-border-primary rounded-lg">
+        <p className="text-sm text-text-secondary">
+          {visualizationData.explanation}
+        </p>
       </div>
     </div>
   );
