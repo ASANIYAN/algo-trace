@@ -214,18 +214,30 @@ function validateAndFixVisualizationData(
 ): VisualizationData {
   // For graph visualizations, ensure edges are in every step
   if (data.dataStructureType === "graph") {
-    const initialEdges = data.initialState?.edges || [];
-    const initialNodes = data.initialState?.nodes || [];
+    let edges = data.initialState?.edges || [];
+    const nodes = data.initialState?.nodes || [];
+
+    if (edges.length === 0 && nodes.length > 1) {
+      console.warn("AI forgot edges. Generating fallback connections...");
+      for (let i = 0; i < nodes.length - 1; i++) {
+        edges.push({ from: nodes[i].id, to: nodes[i + 1].id });
+      }
+      // Add a loop back to make it look like a real graph
+      edges.push({ from: nodes[nodes.length - 1].id, to: nodes[0].id });
+
+      if (!data.initialState) data.initialState = { nodes: [] };
+      data.initialState.edges = edges;
+    }
 
     data.steps = data.steps.map((step) => {
-      // Ensure edges exist in state
-      if (!step.state.edges || step.state.edges.length === 0) {
-        step.state.edges = initialEdges;
-      }
-      // Ensure nodes exist in state
-      if (!step.state.nodes || step.state.nodes.length === 0) {
-        step.state.nodes = initialNodes;
-      }
+      step.state.edges =
+        step.state.edges && step.state.edges.length > 0
+          ? step.state.edges
+          : edges;
+      step.state.nodes =
+        step.state.nodes && step.state.nodes.length > 0
+          ? step.state.nodes
+          : nodes;
       return step;
     });
   }
