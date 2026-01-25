@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 interface GraphNode {
@@ -32,18 +32,35 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const simulationRef = useRef<d3.Simulation<SimNode, any> | null>(null);
 
-  // 1. Setup the simulation ONCE
+  // State to track container dimensions
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  // 1. Listen for Resize Events
   useEffect(() => {
-    if (!svgRef.current || !data.nodes.length) return;
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        setDimensions({ width, height });
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  // 2. Setup/Update Simulation
+  useEffect(() => {
+    // Only run if we have dimensions and nodes
+    if (!svgRef.current || !data.nodes.length || dimensions.width === 0) return;
 
     const svg = d3.select(svgRef.current);
-    const width = containerRef.current?.clientWidth || 800;
-    const height = containerRef.current?.clientHeight || 500;
+    const { width, height } = dimensions;
 
-    // Clear previous render to prevent duplicates in Strict Mode
+    // Clear previous render
     svg.selectAll("*").remove();
 
-    // Prepare data references
     const nodes = data.nodes.map((d) => ({ ...d })) as SimNode[];
     const links = data.edges.map((d) => ({
       source: d.from,
@@ -61,12 +78,13 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
           .distance(150),
       )
       .force("charge", d3.forceManyBody().strength(-500))
+      // Use the dynamic width/height from state
       .force("center", d3.forceCenter(width / 2, height / 2))
       .force("collision", d3.forceCollide().radius(50));
 
     simulationRef.current = simulation;
 
-    // Draw Edges
+    // --- Drawing Logic ---
     const link = svg
       .append("g")
       .selectAll("line")
@@ -76,7 +94,6 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
       .attr("stroke", "#3a3a3a")
       .attr("stroke-width", 3);
 
-    // Draw Nodes
     const node = svg
       .append("g")
       .selectAll("g")
@@ -127,14 +144,15 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
     return () => {
       simulation.stop();
     };
-  }, []);
 
-  // 2. Handle Highlights in a SEPARATE effect
+    // Adding dimensions to dependency array ensures it re-centers on resize
+  }, [data.nodes, data.edges, dimensions]);
+
+  // 3. Handle Highlights (This effect remains reactive to data)
   useEffect(() => {
     if (!svgRef.current) return;
     const svg = d3.select(svgRef.current);
 
-    // Update Nodes
     svg
       .selectAll(".graph-node circle")
       .transition()
@@ -146,7 +164,6 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
         data.highlightedNodes?.includes(d.id) ? "#00d071" : "#3a3a3a",
       );
 
-    // Update Edges
     svg
       .selectAll(".graph-link")
       .transition()
@@ -162,8 +179,11 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
   }, [data.highlightedNodes, data.highlightedEdges]);
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-[500px] bg-black">
-      <svg ref={svgRef} className="w-full h-full" />
+    <div
+      ref={containerRef}
+      className="w-full h-full min-h-[500px] bg-black overflow-hidden"
+    >
+      <svg ref={svgRef} width="100%" height="100%" />
     </div>
   );
 };

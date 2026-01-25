@@ -1,5 +1,11 @@
 import type { VisualizationData } from "@/types";
 import { GoogleGenAI, type GenerateContentConfig } from "@google/genai";
+import {
+  MAX_ARRAY_LENGTH,
+  MAX_INPUT_LENGTH,
+  MAX_NODES,
+  MAX_STEPS,
+} from "./constants";
 
 const client = new GoogleGenAI({
   apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
@@ -8,6 +14,12 @@ const client = new GoogleGenAI({
 export async function analyzeProblemAndGenerateVisualization(
   problemDescription: string,
 ): Promise<VisualizationData> {
+  if (problemDescription.length > MAX_INPUT_LENGTH) {
+    throw new Error(
+      `Problem description too long (${problemDescription.length} characters). Please limit to ${MAX_INPUT_LENGTH} characters for optimal visualization.`,
+    );
+  }
+
   const schema = {
     type: "OBJECT",
     properties: {
@@ -188,7 +200,7 @@ Return ONLY valid JSON matching the schema. No markdown, no explanations outside
     const visualizationData = JSON.parse(response.text) as VisualizationData;
 
     // Post-process to fix common issues
-    return validateAndFixVisualizationData(visualizationData);
+    return validateAndSanitizeData(visualizationData);
   } catch (error: any) {
     console.error("GenAI API Error:", error);
 
@@ -206,6 +218,41 @@ Return ONLY valid JSON matching the schema. No markdown, no explanations outside
     }
     throw new Error("Failed to generate visualization. Please try again.");
   }
+}
+
+function validateAndSanitizeData(data: VisualizationData): VisualizationData {
+  // Validate step count
+  if (data.steps.length > MAX_STEPS) {
+    console.warn(
+      `Too many steps (${data.steps.length}). Truncating to ${MAX_STEPS}`,
+    );
+    data.steps = data.steps.slice(0, MAX_STEPS);
+  }
+
+  // Validate array length
+  if (data.dataStructureType === "array") {
+    data.steps.forEach((step) => {
+      if (step.state.array && step.state.array.length > MAX_ARRAY_LENGTH) {
+        console.warn(
+          `Array too large (${step.state.array.length}). Truncating to ${MAX_ARRAY_LENGTH}`,
+        );
+        step.state.array = step.state.array.slice(0, MAX_ARRAY_LENGTH);
+        step.description += " (Array truncated for visualization)";
+      }
+    });
+  }
+
+  // Validate node count for trees/graphs
+  if (data.dataStructureType === "tree" || data.dataStructureType === "graph") {
+    const nodeCount = data.initialState?.nodes?.length || 0;
+    if (nodeCount > MAX_NODES) {
+      throw new Error(
+        `Too many nodes (${nodeCount}) for visualization. Please simplify to ${MAX_NODES} or fewer nodes.`,
+      );
+    }
+  }
+
+  return validateAndFixVisualizationData(data);
 }
 
 // Helper to validate and fix the visualization data
