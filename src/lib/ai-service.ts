@@ -269,7 +269,7 @@ function validateAndFixVisualizationData(
       for (let i = 0; i < nodes.length - 1; i++) {
         edges.push({ from: nodes[i].id, to: nodes[i + 1].id });
       }
-      // Add a loop back to make it look like a real graph
+      // loop back to make it look like a real graph
       edges.push({ from: nodes[nodes.length - 1].id, to: nodes[0].id });
 
       if (!data.initialState) data.initialState = { nodes: [] };
@@ -304,8 +304,6 @@ function validateAndFixVisualizationData(
   // For array visualizations, parse pointer info from descriptions and highlightedNodes
   if (data.dataStructureType === "array") {
     data.steps = data.steps.map((step) => {
-      // If there are highlightedNodes, we can infer pointers from the description
-      // This is a workaround since we can't use dynamic object properties in Gemini schema
       if (step.highlightedNodes && step.highlightedNodes.length > 0) {
         const pointers: Record<string, number> = {};
 
@@ -321,7 +319,6 @@ function validateAndFixVisualizationData(
           } else if (desc.includes("mid")) {
             pointers["M"] = index;
           } else {
-            // Generic pointer naming if we can't infer
             pointers[`P${i}`] = index;
           }
         });
