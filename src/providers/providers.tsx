@@ -23,7 +23,7 @@ const Providers = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RouterProvider router={router} />
-        <Toaster />
+        <Toaster richColors={false} position="top-center" />
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
