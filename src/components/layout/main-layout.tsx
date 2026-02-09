@@ -1,12 +1,16 @@
+import { useAuth } from "@/contexts/auth-contexts";
 import React from "react";
+import { BaseButton } from "../common/base-button";
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+  const { user, signOut } = useAuth();
+
   return (
-    <div className="min-h-screen bg-background text-text-primary">
+    <section className="min-h-screen bg-background text-text-primary">
       {/* Header */}
       <header className="border-b border-border-primary sticky top-0 bg-background z-10">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
@@ -17,8 +21,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 BETA
               </span>
             </div>
-            <div className="hidden sm:block text-sm text-text-secondary">
-              AI-Powered Algorithm Visualization
+            <div className="flex items-center gap-4">
+              <span className="hidden sm:inline text-sm text-text-secondary">
+                {user?.email}
+              </span>
+              <BaseButton variant="ghost" size="sm" onClick={() => signOut()}>
+                Sign Out
+              </BaseButton>
             </div>
           </div>
         </div>
@@ -37,6 +46,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </p>
         </div>
       </footer>
-    </div>
+    </section>
   );
 };

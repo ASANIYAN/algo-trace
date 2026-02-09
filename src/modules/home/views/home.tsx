@@ -1,33 +1,11 @@
 import { MainLayout } from "@/components/layout/main-layout";
-import { analyzeProblemAndGenerateVisualization } from "@/lib/ai-service";
-import { useVisualizationStore } from "@/store/visualisation-store";
-import { useState } from "react";
 import { ProblemInput } from "../components/problem-input";
 import { VisualizationCanvas } from "@/components/visualisation/visual-canvas";
 import { PlaybackControls } from "@/components/controls/playback-controls";
+import { useHome } from "../hooks/useHome";
 
 function Home() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const setVisualizationData = useVisualizationStore(
-    (state) => state.setVisualizationData,
-  );
-
-  const handleProblemSubmit = async (problem: string) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const visualizationData =
-        await analyzeProblemAndGenerateVisualization(problem);
-      setVisualizationData(visualizationData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      console.error("Error:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { isLoading, error, handleProblemSubmit } = useHome();
 
   return (
     <MainLayout>
