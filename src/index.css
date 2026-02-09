@@ -136,6 +136,8 @@ body {
 }
 
 @theme {
+  --font-geist: "Geist", sans-serif;
+
   --color-background: #000000;
   --color-background-secondary: #0a0a0a;
   --color-background-tertiary: #111111;
