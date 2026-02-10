@@ -1,26 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-interface TreeNode {
+type TreeNode = {
   id: string;
   value: number | string;
   left?: string;
   right?: string;
-}
+};
 
-interface TreeVisualizerProps {
+type TreeVisualizerProps = {
   data: {
     nodes: TreeNode[];
     highlightedNodes?: string[];
   };
-}
+};
 
 export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // 1. Monitor Container Size
   useEffect(() => {
     if (!containerRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -35,7 +34,6 @@ export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data }) => {
     return () => observer.disconnect();
   }, []);
 
-  // 2. Main Render Logic
   useEffect(() => {
     if (!svgRef.current || dimensions.width === 0 || !data?.nodes?.length)
       return;
@@ -46,7 +44,6 @@ export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data }) => {
     const { width, height } = dimensions;
     const isMobile = width < 640;
 
-    // Responsive Margins & Radii
     const margin = isMobile
       ? { top: 40, right: 20, bottom: 40, left: 20 }
       : { top: 60, right: 60, bottom: 60, left: 60 };
@@ -60,7 +57,6 @@ export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data }) => {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // --- Data Transformation (Flat to Hierarchy) ---
     const nodeMap = new Map<string, any>();
     data.nodes.forEach((node) =>
       nodeMap.set(node.id, { ...node, children: [] }),
@@ -84,14 +80,12 @@ export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data }) => {
         node.children.push(nodeMap.get(original.right));
     });
 
-    // --- D3 Tree Layout ---
     const hierarchy = d3.hierarchy(root);
     const treeLayout = d3.tree().size([innerWidth, innerHeight]);
     const treeData = treeLayout(hierarchy);
 
     const highlightedIds = new Set(data.highlightedNodes || []);
 
-    // --- Draw Links ---
     mainGroup
       .append("g")
       .selectAll("path")

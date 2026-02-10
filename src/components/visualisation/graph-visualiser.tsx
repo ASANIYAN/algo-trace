@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-interface GraphNode {
+type GraphNode = {
   id: string;
   value: number | string;
-}
+};
 
 interface SimNode extends GraphNode {
   x: number;
@@ -13,29 +13,27 @@ interface SimNode extends GraphNode {
   fy?: number | null;
 }
 
-interface GraphEdge {
+type GraphEdge = {
   from: string;
   to: string;
-}
+};
 
-interface GraphVisualizerProps {
+type GraphVisualizerProps = {
   data: {
     nodes: GraphNode[];
     edges: GraphEdge[];
     highlightedNodes?: string[];
     highlightedEdges?: string[];
   };
-}
+};
 
 export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const simulationRef = useRef<d3.Simulation<SimNode, any> | null>(null);
 
-  // State to track container dimensions
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // 1. Listen for Resize Events
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -50,15 +48,12 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
     return () => resizeObserver.disconnect();
   }, []);
 
-  // 2. Setup/Update Simulation
   useEffect(() => {
-    // Only run if we have dimensions and nodes
     if (!svgRef.current || !data.nodes.length || dimensions.width === 0) return;
 
     const svg = d3.select(svgRef.current);
     const { width, height } = dimensions;
 
-    // Clear previous render
     svg.selectAll("*").remove();
 
     const nodes = data.nodes.map((d) => ({ ...d })) as SimNode[];
@@ -144,11 +139,8 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
     return () => {
       simulation.stop();
     };
-
-    // Adding dimensions to dependency array ensures it re-centers on resize
   }, [data.nodes, data.edges, dimensions]);
 
-  // 3. Handle Highlights (This effect remains reactive to data)
   useEffect(() => {
     if (!svgRef.current) return;
     const svg = d3.select(svgRef.current);
@@ -181,7 +173,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ data }) => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full min-h-[500px] bg-black overflow-hidden"
+      className="w-full h-full min-h-125 bg-black overflow-hidden"
     >
       <svg ref={svgRef} width="100%" height="100%" />
     </div>

@@ -1,23 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-interface ArrayVisualizerProps {
+type ArrayVisualizerProps = {
   data: {
     array: number[];
     pointers?: Record<string, number>;
     highlightedNodes?: string[];
   };
-}
+};
 
 export const ArrayVisualizer: React.FC<ArrayVisualizerProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  // Track dimensions in state to trigger re-renders on resize
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // ============================================================
-  // STEP 1: Handle Resizing
-  // ============================================================
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -32,9 +28,6 @@ export const ArrayVisualizer: React.FC<ArrayVisualizerProps> = ({ data }) => {
     return () => resizeObserver.disconnect();
   }, []);
 
-  // ============================================================
-  // STEP 2: The Drawing Logic (Runs on data OR dimension change)
-  // ============================================================
   useEffect(() => {
     if (!svgRef.current || dimensions.width === 0 || !data?.array?.length)
       return;
@@ -55,13 +48,12 @@ export const ArrayVisualizer: React.FC<ArrayVisualizerProps> = ({ data }) => {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Dynamic sizing based on array length and current width
     const cellWidth = Math.min(
       isMobile ? 50 : 80,
       (innerWidth - data.array.length * 5) / data.array.length,
     );
     const cellHeight = isMobile ? 45 : 60;
-    const spacing = Math.max(4, innerWidth * 0.01); // Responsive spacing
+    const spacing = Math.max(4, innerWidth * 0.01);
 
     const totalArrayWidth = data.array.length * (cellWidth + spacing) - spacing;
     const startX = (innerWidth - totalArrayWidth) / 2;
@@ -71,9 +63,6 @@ export const ArrayVisualizer: React.FC<ArrayVisualizerProps> = ({ data }) => {
       (data.highlightedNodes || []).map((nodeStr) => parseInt(nodeStr, 10)),
     );
 
-    // ============================================================
-    // STEP 3: Render Elements
-    // ============================================================
     data.array.forEach((value, index) => {
       const isHighlighted = highlightedIndices.has(index);
       const x = startX + index * (cellWidth + spacing);
