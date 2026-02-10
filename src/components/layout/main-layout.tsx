@@ -1,13 +1,15 @@
 import { useAuth } from "@/contexts/auth-contexts";
-import React from "react";
+import React, { useState } from "react";
 import { BaseButton } from "../common/base-button";
+import { LogoutModal } from "../common/logout-modal";
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   return (
     <section className="min-h-screen bg-background text-text-primary">
@@ -25,7 +27,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <span className="hidden sm:inline text-sm text-text-secondary">
                 {user?.email}
               </span>
-              <BaseButton variant="ghost" size="sm" onClick={() => signOut()}>
+              <BaseButton
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowLogoutModal(true)}
+              >
                 Sign Out
               </BaseButton>
             </div>
@@ -46,6 +52,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </p>
         </div>
       </footer>
+
+      {/* Logout Modal */}
+      <LogoutModal open={showLogoutModal} onOpenChange={setShowLogoutModal} />
     </section>
   );
 };
