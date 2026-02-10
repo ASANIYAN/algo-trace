@@ -134,7 +134,7 @@ npm run preview
 
 **Backend:**
 
-- Supabase (PostgreSQL + Auth + Edge Functions)
+- Supabase (PostgreSQL + Auth)
 - AI Integration for algorithm analysis
 
 **Development:**
