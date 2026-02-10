@@ -94,7 +94,7 @@ export const SignupForm: React.FC = () => {
           label="Password"
           placeholder="Enter your password"
           autoComplete="new-password"
-          description="Must be at least 6 characters"
+          description="Must be at least 6 alphanumeric characters including special characters"
         />
 
         <FormInput
