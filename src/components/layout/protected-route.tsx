@@ -12,9 +12,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-accent-blue border-t-transparent" />
-          <p className="mt-4 text-text-secondary">Loading...</p>
+        <div className="text-center space-y-4">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-accent-blue border-t-transparent" />
+          <p className="text-lg text-text-primary font-medium">
+            Authenticating
+          </p>
         </div>
       </div>
     );
