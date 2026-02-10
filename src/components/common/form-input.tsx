@@ -43,7 +43,7 @@ const FormInput: React.FC<
               <FieldLabel
                 htmlFor={field.name}
                 className={cn(
-                  `text-graphite text-sm sm:text-base`,
+                  `text-graphite text-sm sm:text-base text-white`,
                   formLabelClassName,
                 )}
               >

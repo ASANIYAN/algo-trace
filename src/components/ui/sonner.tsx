@@ -32,8 +32,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       toastOptions={{
         classNames: {
-          success: "bg-accent-blue! text-white! font-geist rounded!",
-          error: "bg-accent-red text-white! font-geist rounded!",
+          success:
+            "bg-accent-blue! text-white! border border-accent-blue font-geist rounded!",
+          error:
+            "bg-accent-red! text-white! border border-accent-red! font-geist rounded!",
         },
       }}
       {...props}
