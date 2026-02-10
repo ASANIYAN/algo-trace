@@ -1,73 +1,149 @@
-# React + TypeScript + Vite
+# AlgoTrace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**AI-Powered Algorithm Visualization Platform**
 
-Currently, two official plugins are available:
+AlgoTrace is an interactive web application that transforms complex algorithmic problems into visual, step-by-step representations. Built to bridge the gap between abstract algorithmic thinking and concrete understanding, it helps visualize algorithms in action.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Purpose & Vision
 
-## React Compiler
+Understanding algorithms can be challenging when dealing with abstract concepts and complex data transformations. AlgoTrace was created to:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Visualize Complex Logic**: Transform algorithmic problems into interactive visual representations
+- **Enhance Learning**: Help students and developers understand algorithm behavior through step-by-step visualization
+- **Problem Solving**: Provide visual debugging and analysis tools for algorithmic solutions
+- **Educational Support**: Offer educators a powerful tool for teaching algorithmic concepts
 
-## Expanding the ESLint configuration
+## Architecture
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Backend: Supabase
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Database**: PostgreSQL for user management, usage tracking, and data persistence
+- **Authentication**: Built-in auth system with email/password and OAuth providers
+- **Row Level Security**: Fine-grained access control for user data
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+_Why Supabase?_ Provides a complete backend-as-a-service solution with excellent TypeScript support, reducing infrastructure complexity and suitable for a mini-project of this scale.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Frontend: React + TypeScript
+
+Built with modern React patterns focusing on separation of concerns:
+
+#### Service Layer Pattern
+
+- **Custom Hooks**: Business logic encapsulated in reusable hooks (`useHome`, `useLoginForm`, `useSignupForm`)
+- **Service Functions**: External API calls and data processing separated from UI components
+- **State Management**: Zustand for global state, React Query for server state
+- **Validation**: Zod schemas for type-safe form validation and data integrity
+
+#### UI Layer
+
+- **Component Library**: Custom components built with Tailwind CSS and Radix UI primitives
+- **Design System**: Consistent theming with CSS custom properties
+- **Responsive Design**: Mobile-first approach with breakpoint-specific layouts
+
+## Project Structure
+
+```
+src/
+├── components/           # Reusable UI components
+│   ├── common/          # Base components (buttons, forms, modals)
+│   ├── layout/          # Layout components (main-layout, protected-route)
+│   ├── ui/              # Shadcn/ui components (dialog, sonner)
+│   └── visualisation/   # Visualization components (graphs, trees, arrays)
+├── contexts/            # React contexts (auth-context)
+├── lib/                 # Utilities and configurations
+│   ├── ai-service.ts    # AI integration service
+│   ├── supabase.ts      # Supabase client configuration
+│   └── utils.ts         # Helper functions
+├── modules/             # Feature-based modules
+│   ├── auth/            # Authentication module
+│   │   ├── components/  # Auth-specific components
+│   │   ├── hooks/       # Auth business logic hooks
+│   │   ├── utils/       # Auth utilities and validation
+│   │   └── views/       # Auth page components
+│   └── home/            # Home module
+│       ├── components/  # Home-specific components
+│       ├── hooks/       # Home business logic hooks
+│       └── views/       # Home page components
+├── providers/           # App-level providers
+├── router/              # React Router configuration
+└── store/               # Global state management (Zustand)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js 18+
+- npm or yarn
+- Supabase account
+
+### Environment Setup
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Supabase Configuration
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# AI Service Configuration (if using external AI APIs)
+VITE_AI_API_KEY=your_ai_api_key
+VITE_AI_API_URL=your_ai_service_endpoint
 ```
+
+### Installation & Development
+
+```bash
+# Clone the repository
+git clone https://github.com/ASANIYAN/algo-trace.git
+cd algo-trace
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+### Supabase Setup
+
+1. Create a new Supabase project
+2. Run the provided SQL migrations (if any)
+3. Configure authentication providers
+4. Set up Row Level Security policies
+5. Add your Supabase URL and anon key to `.env.local`
+
+## Tech Stack
+
+**Frontend:**
+
+- React 18 with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- React Router for navigation
+- TanStack Query for server state
+- Zustand for client state
+- React Hook Form + Zod for forms
+- Sonner for notifications
+
+**Backend:**
+
+- Supabase (PostgreSQL + Auth + Edge Functions)
+- AI Integration for algorithm analysis
+
+**Development:**
+
+- ESLint + TypeScript for code quality
+
+## Key Features
+
+- **Algorithm Visualization**: Interactive step-by-step algorithm execution
+- **Multiple Data Structures**: Support for arrays, trees, graphs, and more
+- **User Authentication**: Secure user accounts with usage tracking
+- **Responsive Design**: Works seamlessly on desktop and mobile
