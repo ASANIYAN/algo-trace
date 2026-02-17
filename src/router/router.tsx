@@ -4,6 +4,8 @@ import { LoginPage } from "@/modules/auth/views/login-page";
 import { SignupPage } from "@/modules/auth/views/signup-page";
 import Home from "@/modules/home/views/home";
 import { createBrowserRouter, type RouteObject } from "react-router-dom";
+import { ForgotPasswordPage } from "@/modules/auth/views/forgot-password-page";
+import { ResetPasswordPage } from "@/modules/auth/views/reset-password-page";
 
 const unprotectedRoutes: RouteObject[] = [
   {
@@ -13,6 +15,14 @@ const unprotectedRoutes: RouteObject[] = [
   {
     path: "/signup",
     element: <SignupPage />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
   },
 ];
 

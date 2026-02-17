@@ -12,12 +12,7 @@ export const BaseInput = React.forwardRef<
   React.ComponentProps<typeof Input> & BaseProps
 >(({ className, tip, containerClassName, ...props }, ref) => {
   return (
-    <div
-      className={cn(
-        "bg-background-secondary border border-border-primary rounded-lg p-6",
-        containerClassName,
-      )}
-    >
+    <div className={cn("bg-background-secondary", containerClassName)}>
       <Input
         ref={ref}
         className={cn(

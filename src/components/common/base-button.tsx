@@ -34,15 +34,15 @@ export const BaseButton: React.FC<ButtonProps> = ({
     secondary:
       "bg-background-tertiary text-text-primary border border-border-secondary hover:border-border-accent",
     outline:
-      "bg-transparent text-text-primary border border-border-primary hover:border-accent-blue hover:text-accent-blue",
+      "bg-transparent text-text-primary border border-border-primary hover:border-accent-blue hover:text-accent-blue font-light",
     ghost:
       "bg-transparent text-text-secondary hover:bg-background-tertiary hover:text-text-primary",
   };
 
   const sizes = {
     sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-base",
-    lg: "px-6 py-3 text-lg",
+    md: "px-4 py-2.5 text-base",
+    lg: "px-6 py-3.5 text-lg",
   };
 
   return (

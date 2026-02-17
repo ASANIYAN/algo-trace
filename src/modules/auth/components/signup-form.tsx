@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { SocialAuthButtons } from "./social-auth-buttons";
 import FormInput from "@/components/common/form-input";
+import FormPasswordInput from "@/components/common/form-password-input";
 import { useSignupForm } from "../hooks/useSignupForm";
 
 export const SignupForm: React.FC = () => {
@@ -87,20 +88,18 @@ export const SignupForm: React.FC = () => {
           error={errors.email?.message}
         />
 
-        <FormInput
+        <FormPasswordInput
           control={control}
           name="password"
-          type="password"
           label="Password"
           placeholder="Enter your password"
           autoComplete="new-password"
           description="Must be at least 6 alphanumeric characters including special characters"
         />
 
-        <FormInput
+        <FormPasswordInput
           control={control}
           name="confirmPassword"
-          type="password"
           label="Confirm Password"
           autoComplete="new-password"
           placeholder="Re-enter your password"
@@ -109,7 +108,7 @@ export const SignupForm: React.FC = () => {
         <BaseButton
           type="submit"
           variant="primary"
-          className="w-full"
+          className="w-full h-12.5"
           loading={isLoading}
         >
           Create Account

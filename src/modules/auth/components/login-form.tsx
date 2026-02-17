@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { SocialAuthButtons } from "./social-auth-buttons";
 import FormInput from "@/components/common/form-input";
+import FormPasswordInput from "@/components/common/form-password-input";
 import { BaseButton } from "@/components/common/base-button";
 import { useLoginForm } from "../hooks/useLoginForm";
 
@@ -32,7 +33,7 @@ export const LoginForm: React.FC = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <FormInput
           control={control}
           name="email"
@@ -43,15 +44,23 @@ export const LoginForm: React.FC = () => {
           error={errors.email?.message}
         />
 
-        <FormInput
-          control={control}
-          name="password"
-          type="password"
-          label="Password"
-          autoComplete="current-password"
-          placeholder="Enter your password"
-          error={errors.password?.message}
-        />
+        <div className="space-y-2.5">
+          <FormPasswordInput
+            control={control}
+            name="password"
+            label="Password"
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            error={errors.password?.message}
+          />
+
+          <Link
+            to="/forgot-password"
+            className="text-accent-blue hover:underline font-medium text-right block text-sm"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
         <BaseButton
           type="submit"
