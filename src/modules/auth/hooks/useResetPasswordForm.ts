@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/auth-contexts";
 import { resetPasswordSchema } from "../utils/resetPasswordValidation";
 import type { ResetPasswordFormType } from "../utils/resetPasswordValidation";
 import { supabase } from "@/lib/supabase";
+import { useNavigate } from "react-router-dom";
 
 export type PageState = "loading" | "valid" | "invalid" | "success";
 
@@ -15,6 +16,7 @@ export const useResetPasswordForm = () => {
   const [pageState, setPageState] = useState<PageState>("loading");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<ResetPasswordFormType>({
     resolver: zodResolver(resetPasswordSchema),
@@ -44,10 +46,15 @@ export const useResetPasswordForm = () => {
   const mutation = useMutation({
     mutationFn: async (data: ResetPasswordFormType) => {
       await updatePassword(data.password);
+      await supabase.auth.signOut();
     },
     onSuccess: () => {
       setPageState("success");
-      toast.success("Password updated successfully!");
+      toast.success("Password updated successfully! Please log in.");
+      navigate("/login", {
+        replace: true,
+        state: { message: "Password updated successfully! Please log in." },
+      });
     },
     onError: (err: Error) => {
       toast.error(
